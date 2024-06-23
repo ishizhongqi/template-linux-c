@@ -1,0 +1,41 @@
+# 动态链接库名
+PROG = libtest.so
+
+# 编译器
+CC = gcc
+
+# 文件目录
+SRCDIR = src
+INCDIR = include
+OBJDIR = build
+LIBDIR = lib
+
+# 源文件列表（所有.c文件）
+SRCS = $(wildcard $(SRCDIR)/*.c)
+
+# 对象文件列表（从源文件列表生成）
+OBJS = $(SRCS:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
+
+# 库文件路径
+LIB = $(LIBDIR)/$(PROG)
+
+# 默认目标
+all: $(LIB)
+
+# 编译规则，从.c文件生成.o文件
+$(OBJDIR)/%.o: $(SRCDIR)/%.c
+	$(CC) -c $< -o $@ -I$(INCDIR) -fPIC
+
+# 创建动态库文件的规则
+$(LIB): $(OBJS)
+	$(CC) -shared -o $@ $^
+
+# 清理编译生成的文件
+clean:
+	rm -f $(OBJDIR)/*.o $(LIB)
+
+# 确保对象文件和库文件目录存在
+$(shell mkdir -p $(OBJDIR) $(LIBDIR) || true)
+
+# 依赖关系，确保在编译之前对象文件目录存在
+$(OBJS): | $(OBJDIR)

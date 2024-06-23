@@ -1,0 +1,42 @@
+# 可执行文件名
+PROG = test
+
+# 编译器
+CC = gcc
+
+# 文件目录
+BINDIR = .
+OBJDIR = .
+INCDIR = ../include
+LIBDIR = ../lib
+SRCDIR = .
+
+# 源文件列表（所有.c文件）
+SRCS = $(wildcard $(SRCDIR)/*.c)
+
+# 对象文件列表（从源文件列表生成）
+OBJS = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SRCS))
+
+# 可执行文件路径 
+TARGET = $(BINDIR)/$(PROG)
+
+# 需要链接的库
+LIBS = -L$(LIBDIR) -lexample
+
+# 默认目标
+all: $(TARGET)
+
+# 编译规则：从.c文件生成.o文件
+$(OBJDIR)/%.o: $(SRCDIR)/%.c
+	$(CC) -c $< -o $@ -I$(INCDIR) 
+
+# 链接规则：从.o文件生成可执行文件，并链接库
+$(TARGET): $(OBJS)
+	$(CC) $(OBJS) $(LIBS) -o $@
+
+# 清理编译生成的文件
+clean:
+	rm -f $(OBJDIR)/*.o $(TARGET)
+
+# 依赖关系，确保在编译之前对象文件目录存在
+$(OBJS): | $(OBJDIR)
